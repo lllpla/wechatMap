@@ -12,12 +12,17 @@
   </view>
   <view class="weui-cells__title">目的地列表(长按删除目的地)</view>
   <view class="weui-cells weui-cells_after-title">
-  <block wx:if="{{hasPlace}}">
+  <block wx:if="{{placeList.length}}>0">
     <block wx:for="{{placeList}}" wx:for-item="place" wx:key="{{index}}">
-      <view class="weui-cell" bindlongpress="delPlace"  id="{{index}}">
-        <view class="weui-cell__bd">{{place.title}}</view>
-        <view class="weui-cell__ft">{{place.city}}</view>
+      <view class="weui-cell" bindlongpress="delPlace" id="{{index}}_place"bindtap="moreInfo">
+        <view class="weui-cell__bd" style="font-size:small;">{{place.title}}</view>
+        <view class="weui-cell__ft" style="font-size:small;">耗时：{{place.duration}}min 距离：{{place.distance}}km</view>
       </view>
+      <view class='weui-cells__tips' hidden="{{place.hidden}}">
+        <view class="weui-cell__bd" style="font-size:small;">{{place.address}}</view>
+        <view class="weui-cell__ft" style="font-size:small;">{{place.city}} {{place.district}}</view>
+      </view>
+       
     </block>
   </block>
   </view>
@@ -36,7 +41,7 @@
   <block wx:if="{{hasSuggest}}">
     <scroll-view scroll-y style="height: 200px;">
       <block wx:for="{{suggestList}}" wx:for-item="suggest" wx:key="{{suggest.id}}">
-        <view class="weui-cell" id="{{index}}" bindtap="suggestBindType">
+        <view class="weui-cell" id="{{index}}_suggest" bindtap="suggestBindTap">
           <label hidden='true'>{{suggest}}</label>
           <view class="weui-cell__bd" style="font-size:small;">{{suggest.title}}</view>
           <view class="weui-cell__ft" style="font-size:small;">{{suggest.city}}</view>
