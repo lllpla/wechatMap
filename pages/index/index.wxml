@@ -10,7 +10,8 @@
       <view class="weui-cell__ft">已登录</view>
     </block>
   </view>
-
+  <view class="weui-cells__title">目的地列表(长按删除目的地)</view>
+  <view class="weui-cells weui-cells_after-title">
   <block wx:if="{{hasPlace}}">
     <block wx:for="{{placeList}}" wx:for-item="place" wx:key="{{index}}">
       <view class="weui-cell" bindlongpress="delPlace"  id="{{index}}">
@@ -19,6 +20,9 @@
       </view>
     </block>
   </block>
+  </view>
+  <view class="weui-cells__title">地点查询</view>
+  <view class="weui-cells weui-cells_after-title">
   <view class="weui-cell">
     <view class="weui-cell__bd">
       <input class="weui-input" bindinput="bindKeyInput" placeholder="请输入地点名称" value="{{inputValue}}" />
@@ -27,6 +31,7 @@
     <view class="weui-cell__ft">
       <button class="weui-btn" type="Normal" size='mini' bindtap="getMapData">确定</button>
     </view>
+  </view>
   </view>
   <block wx:if="{{hasSuggest}}">
     <scroll-view scroll-y style="height: 200px;">
