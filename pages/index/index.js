@@ -228,16 +228,7 @@ Page({
         //格式化时间和距离
         res.data.result.routes[0].distance = (res.data.result.routes[0].distance / 1000).toFixed(2)
         res.data.result.routes[0].duration = (res.data.result.routes[0].duration / 60).toFixed(2)
-        /**      
-        var hour = 0
-        var min = 0
-        if (res.data.result.routes[0].duration>60){
-          hour = Math.floor(res.data.result.routes[0].duration/60)
-          min = (res.data.result.routes[0].duration%60).toFixed(0)
-        }else{
-          min = res.data.result.routes[0].duration
-        }
-        **/
+        
         //路况
         res.data.result.routes[0].traffic_condition = traffic_condition
         res.data.result.routes[0].traffic_color = traffic_color
@@ -251,6 +242,11 @@ Page({
               .replace(/\<font color="0xDC3C3C">/g, "")
               .replace(/\<\/font>/g, "")
             step.instructions = instructions
+            if(step.distance<1000){
+              step.distance = step.distance+"m"
+            }else {
+              step.distance = (step.distance/1000).toFixed(2)+"km"
+            }
             return step
           })
         console.log(res.data.result.routes[0].steps)
@@ -309,7 +305,7 @@ Page({
     var tapIdArr = e.currentTarget.id.split("_")
     var tapId = tapIdArr[0]
     var selected = this.data.suggestList[tapId]
-    selected.hidden = false
+    selected.hidden = true
     console.log(selected)
 
     var list = this.data.placeList
