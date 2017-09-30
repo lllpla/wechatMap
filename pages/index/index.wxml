@@ -41,7 +41,7 @@
   <view class="weui-cells weui-cells_after-title">
     <view class="weui-cell">
       <view class="weui-cell__bd">
-        <input class="weui-input" bindinput="bindKeyInput" placeholder="请输入地点名称" value="{{inputValue}}" />
+        <input class="weui-input" bindinput="bindKeyInput2" placeholder="请输入地点名称" value="{{inputValue}}" />
 
       </view>
       <view class="weui-cell__ft">

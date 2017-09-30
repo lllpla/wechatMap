@@ -118,8 +118,44 @@ Page({
     }
 
   },
+  bindKeyInput2: function (e) {
+    console.log(this.chkstrlen(e.detail.value))
+    if (this.chkstrlen(e.detail.value)<4){
+      return
+    }
 
+    var that = this;
+    var fail = function (data) {
+      console.log("bmap fail")
+      console.log(data)
+    };
+    var success = function (data) {
+      console.log("bmap success")
+      console.log(data)
+      that.setData({
+        suggestList: data.result,
+        hasSuggest: true
+      })
+    }
+
+    try {
+      bmap.suggestion({
+        query: e.detail.value,
+        region: "全国",
+        city_limit: false,
+        fail: fail,
+        success: success
+      })
+    } catch (e) {
+      console.log("bmap error")
+      console.log(e)
+    }
+    
+
+
+  },
   bindKeyInput: function (e) {
+    
     this.setData({
       hasSuggest: false
     })
@@ -349,6 +385,17 @@ Page({
       placeList: placeList
     })
     this.savePlaceData()
-  }
-
+  },
+  chkstrlen:function (str)
+　　{
+    　　　　var strlen = 0;
+    　　　　for(var i = 0;i<str.length; i++)
+　　　　{
+  　　　　　　if (str.charCodeAt(i) > 255) //如果是汉字，则字符串长度加2
+    　　　　　　　　strlen += 2;
+  　　　　　　else
+    　　　　　　　　;
+　　　　}
+　　　　return strlen;
+　　},
 })
