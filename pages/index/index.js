@@ -18,7 +18,7 @@ Page({
     suggestList: [],
     hasSuggest: false,
     inputValue: "",
-    allCount:{
+    allCount: {
       allDis: 0,
       allDur: 0,
       allDesc: ""
@@ -173,15 +173,19 @@ Page({
       success: function (res) {
         console.log(res)
         var traffic_condition = ""
+        var traffic_color=""
         switch (res.data.result.traffic_condition) {
           case 1:
             traffic_condition = "畅通"
+            traffic_color="green"
             break
           case 2:
             traffic_condition = "缓行"
+            traffic_color="red"
             break
           case 3:
             traffic_condition = "无路况"
+            traffic_color = "grey"
             break
         }
         console.log(res.data.result.routes[0])
@@ -200,9 +204,21 @@ Page({
         **/
         //路况
         res.data.result.routes[0].traffic_condition = traffic_condition
-        //计算总里程
+        res.data.result.routes[0].traffic_color = traffic_color
+        res.data.result.routes[0].steps = res.data.result.routes[0].steps
+          .map(step => {
+            var instructions = step.instructions
+              .replace(/\<b>/g, "")
+              .replace(/\<\/b>/g, "")
+              .replace(/\<br>/g, "")
+              .replace(/\<br\/>/g, "")
+              .replace(/\<font color="0xDC3C3C">/g, "")
+              .replace(/\<\/font>/g, "")
+            step.instructions = instructions
+            return step
+          })
+        console.log(res.data.result.routes[0].steps)
 
-        //赋值
         that.data.placeList[des].taxi = res.data.result.routes[0]
         that.data.placeList[des].taxi.desc = that.durationToStr(res.data.result.routes[0].duration)
 
@@ -214,38 +230,39 @@ Page({
     })
   },
 
-  countAll:function(){
+  countAll: function () {
     console.log("countAll")
     var alldis = 0;
     var alldur = 0;
-    var alldesc = "";   
-    if (this.data.placeList.length>1){
+    var alldesc = "";
+    if (this.data.placeList.length > 1) {
       alldis = this.data.placeList.filter(place => place.taxi != null).map(place => place.taxi.distance).reduce(function (a, b) { return Number(a) + Number(b); })
       alldur = this.data.placeList.filter(place => place.taxi != null).map(place => place.taxi.duration).reduce(function (a, b) { return Number(a) + Number(b); })
       alldesc = this.durationToStr(alldur)
+      alldis = Number(alldis).toFixed(2)
+      alldur = Number(alldur).toFixed(0)
     }
 
     this.setData({
-      allCount:{
-        alldis: alldis.toFixed(2),
-        alldur: alldur.toFixed(0),
+      allCount: {
+        alldis: alldis,
+        alldur: alldur,
         alldesc: alldesc
       }
     })
-    console.log(this.data)
   },
 
-  durationToStr:function(duration){
+  durationToStr: function (duration) {
     var hour = 0
     var min = 0
     if (duration > 60) {
       hour = Math.floor(duration / 60)
       min = (duration % 60).toFixed(0)
     } else {
-      min = duration
+      min = Number(duration).toFixed(0)
       return (min + "min")
     }
-     return (hour + "h" + min + "min")
+    return (hour + "h" + min + "min")
   },
 
 
@@ -299,7 +316,7 @@ Page({
           var finalList = that.data.placeList
 
           finalList.splice(tapId, 1)
-          if (tapId == 0 && finalList.length!=0) {
+          if (tapId == 0 && finalList.length != 0) {
             finalList[0].taxi = null;
           }
 
@@ -307,13 +324,13 @@ Page({
             placeList: finalList,
           })
 
-         //删除节点后要重新计算删除节点后续节点的距离
-         //删除之后tapId等于被删除节点后面的序号
-          if (finalList.length > 1 
+          //删除节点后要重新计算删除节点后续节点的距离
+          //删除之后tapId等于被删除节点后面的序号
+          if (finalList.length > 1
             && tapId < finalList.length
             && tapId > 0) {
-            that.caldis(tapId-1, tapId)
-          }else{
+            that.caldis(tapId - 1, tapId)
+          } else {
             that.savePlaceData()
           }
         } else if (res.cancel) {
@@ -322,4 +339,16 @@ Page({
       }
     })
   },
+  closeAll: function () {
+    var placeList = this.data.placeList.map(place => {
+      place.hidden = true
+      return place
+    })
+
+    this.setData({
+      placeList: placeList
+    })
+    this.savePlaceData()
+  }
+
 })

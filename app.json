@@ -5,7 +5,7 @@
   ],
   "window":{
     "backgroundTextStyle":"light",
-    "navigationBarBackgroundColor": "#fff",
+    "navigationBarBackgroundColor": "#4682B4",
     "navigationBarTitleText": "地图分析",
     "navigationBarTextStyle":"black"
   }

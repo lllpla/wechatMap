@@ -41,3 +41,28 @@
 .weui-cell-msg__ft {
   text-align: right;
 }
+
+.weui-cell-instr {
+  padding: 10px 15px;
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  font-size: xx-small;
+  background-color: #E1FFFF;
+  box-shadow: 2px 2px 1px #888888 inset;
+
+}
+
+.weui-cell-instr__bd {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.weui-cell-instr__ft {
+  text-align: right;
+}
