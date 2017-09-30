@@ -19,3 +19,25 @@
 .usermotto {
   margin-top: 200px;
 }
+.weui-cell-msg {
+  padding: 10px 15px;
+  position: relative;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  font-size: xx-small;
+  
+}
+
+.weui-cell-msg__bd {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.weui-cell-msg__ft {
+  text-align: right;
+}
