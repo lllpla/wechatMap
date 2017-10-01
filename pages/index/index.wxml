@@ -13,7 +13,13 @@
     </view>
   </view>
   <view class="weui-cells__title">
-    <text class='iconfont icon-map'></text> 目的地列表(长按删除目的地)
+      <view class="title1">
+                  <text class='iconfont icon-map'></text>目的地列表(长按删除目的地)
+      </view>
+      <view class="title2" style="{{canPress}}" bindtap="refreshTraffic">
+              <text class='iconfont icon-refresh' ></text>刷新路况
+      </view>
+      <view class="title1">{{second}}</view>
   </view>
   <view class="weui-cells weui-cells_after-title">
     <block wx:if="{{placeList.length>0}}">

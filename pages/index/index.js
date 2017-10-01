@@ -10,9 +10,11 @@ const app = getApp()
 
 Page({
   data: {
+    second:"  ",
     motto: 'Hello World',
     userInfo: {},
     hasUserInfo: false,
+    canPress: "background-color: #ADFF2F;",
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
     placeList: [],
     suggestList: [],
@@ -120,7 +122,7 @@ Page({
   },
   bindKeyInput2: function (e) {
     console.log(this.chkstrlen(e.detail.value))
-    if (this.chkstrlen(e.detail.value)<4){
+    if (this.chkstrlen(e.detail.value) < 4) {
       return
     }
 
@@ -150,12 +152,12 @@ Page({
       console.log("bmap error")
       console.log(e)
     }
-    
+
 
 
   },
   bindKeyInput: function (e) {
-    
+
     this.setData({
       hasSuggest: false
     })
@@ -209,15 +211,15 @@ Page({
       success: function (res) {
         console.log(res)
         var traffic_condition = ""
-        var traffic_color=""
+        var traffic_color = ""
         switch (res.data.result.traffic_condition) {
           case 1:
             traffic_condition = "畅通"
-            traffic_color="green"
+            traffic_color = "green"
             break
           case 2:
             traffic_condition = "缓行"
-            traffic_color="red"
+            traffic_color = "red"
             break
           case 3:
             traffic_condition = "无路况"
@@ -228,7 +230,7 @@ Page({
         //格式化时间和距离
         res.data.result.routes[0].distance = (res.data.result.routes[0].distance / 1000).toFixed(2)
         res.data.result.routes[0].duration = (res.data.result.routes[0].duration / 60).toFixed(2)
-        
+
         //路况
         res.data.result.routes[0].traffic_condition = traffic_condition
         res.data.result.routes[0].traffic_color = traffic_color
@@ -242,10 +244,10 @@ Page({
               .replace(/\<font color="0xDC3C3C">/g, "")
               .replace(/\<\/font>/g, "")
             step.instructions = instructions
-            if(step.distance<1000){
-              step.distance = step.distance+"m"
-            }else {
-              step.distance = (step.distance/1000).toFixed(2)+"km"
+            if (step.distance < 1000) {
+              step.distance = step.distance + "m"
+            } else {
+              step.distance = (step.distance / 1000).toFixed(2) + "km"
             }
             return step
           })
@@ -382,16 +384,47 @@ Page({
     })
     this.savePlaceData()
   },
-  chkstrlen:function (str)
-　　{
-    　　　　var strlen = 0;
-    　　　　for(var i = 0;i<str.length; i++)
-　　　　{
-  　　　　　　if (str.charCodeAt(i) > 255) //如果是汉字，则字符串长度加2
-    　　　　　　　　strlen += 2;
-  　　　　　　else
-    　　　　　　　　;
-　　　　}
-　　　　return strlen;
-　　},
+  chkstrlen: function (str) 　　{
+    var strlen = 0;
+    for (var i = 0; i < str.length; i++) 　　　　{
+      if (str.charCodeAt(i) > 255) //如果是汉字，则字符串长度加2
+        strlen += 2;
+      else
+        ;
+    　　　　}
+    　　　　return strlen;
+  　　},
+  refreshTraffic: function (e) {
+    if(this.data.second>1){
+      return
+    }
+    console.log("refreshTraffic")
+    for (var i = 1; i < this.data.placeList.length; i++) {
+      console.log(i)
+      this.caldis(i - 1, i)
+    }
+    this.setData({
+      canPress: "background-color: #696969;",
+      second: 60
+    })
+    this.countdown(this)
+  },
+
+  countdown: function (that) {
+    var second = that.data.second
+    if (second == 0) {
+      that.setData({
+        canPress: "background-color: #ADFF2F;",
+        second: "  ",
+      });
+      return;
+    }
+    var timer = setTimeout(function () {
+      that.setData({
+        second: second - 1
+      });
+      that.countdown(that);
+    }, 1000)
+  }
+
 })
