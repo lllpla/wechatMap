@@ -67,7 +67,6 @@
   text-align: right;
 }
 
-
 .weui-cells__title {
   display: flex;
   flex-direction: row;
@@ -84,4 +83,3 @@
   box-shadow: 2px 2px 1px #888888;
   border-radius: 10%
 }
-  

@@ -13,13 +13,13 @@
     </view>
   </view>
   <view class="weui-cells__title">
-      <view class="title1">
-                  <text class='iconfont icon-map'></text>目的地列表(长按删除目的地)
-      </view>
-      <view class="title2" style="{{canPress}}" bindtap="refreshTraffic">
-              <text class='iconfont icon-refresh' ></text>刷新路况
-      </view>
-      <view class="title1">{{second}}</view>
+    <view class="title1">
+      <text class='iconfont icon-map'></text>目的地列表(长按删除目的地)
+    </view>
+    <view class="title2" style="{{canPress}}" bindtap="refreshTraffic">
+      <text class='iconfont icon-refresh'></text>刷新路况
+    </view>
+    <view class="title1">{{second}}</view>
   </view>
   <view class="weui-cells weui-cells_after-title">
     <block wx:if="{{placeList.length>0}}">
@@ -48,7 +48,9 @@
   </view>
   <view class="weui-cells__title">
     <text class='iconfont icon-search'></text> 地点查询
+    <text class='iconfont icon-pin' style='color:blue;' bindtap='bindPin'></text>点击定位当前坐标
   </view>
+
   <view class="weui-cells weui-cells_after-title">
     <view class="weui-cell">
       <view class="weui-cell__bd">

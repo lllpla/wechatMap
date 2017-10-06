@@ -410,6 +410,26 @@ Page({
     this.countdown(this)
   },
 
+  bindPin: function(e){
+    var that = this
+    wx.getLocation({
+      success: function(res) {
+        console.log(res)
+        bmap.regeocoding({
+          pois:1,
+          success:function(data){
+            app.globalData.wxMapData = data
+            console.log(data)
+            console.log(app.globalData.wxMapData)
+            wx.navigateTo({
+              url:"../map/buildinmap"
+            })
+          }
+        })
+      },
+    })
+  },
+
   countdown: function (that) {
     var second = that.data.second
     if (second == 0) {

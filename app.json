@@ -1,12 +1,13 @@
 {
-  "pages":[
+  "pages": [
     "pages/index/index",
-    "pages/logs/logs"
+    "pages/logs/logs",
+    "pages/map/buildinmap"
   ],
-  "window":{
-    "backgroundTextStyle":"light",
+  "window": {
+    "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#4682B4",
     "navigationBarTitleText": "地图分析",
-    "navigationBarTextStyle":"black"
+    "navigationBarTextStyle": "black"
   }
 }
