@@ -231,7 +231,6 @@ Page({
         that.setData({
           placeList: that.data.placeList,
         })
-        that.b2QLoc(des);
         that.savePlaceData()
       }
     })
@@ -247,13 +246,13 @@ Page({
           longitude: step.stepOriginLocation.lng,
           latitude: step.stepOriginLocation.lat
         }
-        points.push(pointA)
+        points.push(that.BdmapEncryptToMapabc(pointA))
       }
       var pointB = {
         longitude: step.stepDestinationLocation.lng,
         latitude: step.stepDestinationLocation.lat
       }
-      points.push(pointB)
+      points.push(that.BdmapEncryptToMapabc(pointB))
     };
     console.log("points:")
     console.log(points)
@@ -269,29 +268,21 @@ Page({
 
 
   //百度坐标转换为腾讯坐标 计算一组
-  b2QLoc: function (i) {
-    var that = this
-    console.log(i)
-    console.log(that.data.placeList[i])
-    if (that.data.placeList[i].taxi.polyLine[0].points.length>0){
-      for (var j = 0; j < that.data.placeList[i].taxi.polyLine[0].points.length;j++){
-        qqmapwx.reverseGeocoder({
-          location: that.data.placeList[i].taxi.polyLine[0].points[j],
-          coord_type: 3,//baidu经纬度
-          success: function (res) {
-            var pointQ = {
-              latitude: res.result.ad_info.location.lat,
-              longitude: res.result.ad_info.location.lng
-            }
-            that.data.placeList[i].taxi.polyLine[0].points[j] = pointQ
-            that.setData({
-              placeList: that.data.placeList
-            })
-          }
-        });
-      }
-    }
-  },
+  BdmapEncryptToMapabc:function (point)  
+{  
+    var fpoint= new Object();  
+    var x_pi = 3.14159265358979324 * 3000.0 / 180.0;  
+    var x = new Number(point.longitude - 0.0065);  
+    var y = new Number(point.latitude - 0.006);  
+    var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi);  
+    var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi);  
+    var Mars_lon = z * Math.cos(theta);  
+    var Mars_lat = z * Math.sin(theta);  
+    fpoint.longitude = Mars_lon;  
+    fpoint.latitude = Mars_lat;  
+    return fpoint;  
+  },  
+
 
   countAll: function () {
     console.log("countAll")
