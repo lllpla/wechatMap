@@ -25,12 +25,15 @@
     <block wx:if="{{placeList.length>0}}">
       <block wx:for="{{placeList}}" wx:for-item="place" wx:key="{{index}}">
         <block wx:if="{{index > 0}}">
+          <map id="map" hidden="{{place.hidden}}" latitude="{{place.taxi.originLocation.lat}}" longitude="{{place.taxi.originLocation.lng}}" polyline="{{place.taxi.polyLine}}" style="width: 100%; height: 350px;" scale='10'></map> 
+          <!-- 
           <block wx:for="{{place.taxi.steps}}" wx:for-item="step" wx:for-index="idx" wx:key="{{idx}}">
             <view class="weui-cell-instr" id="{{index}}_{{idx}}_moreInfo" hidden="{{place.hidden}}" bindtap="moreInfo">
               <view class='weui-cell-instr__bd'>{{step.instructions}}</view>
               <view class='weui-cell-instr__ft'>距离：{{step.distance}}</view>
             </view>
           </block>
+            -->
         </block>
         <view class="weui-cell" bindlongpress="delPlace" id="{{index}}_place" bindtap="moreInfo">
           <view class="weui-cell__bd">{{place.name}}</view>

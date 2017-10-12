@@ -6,6 +6,11 @@ var bmap = new BMap.BMapWX({
   ak: bak
 });
 
+var QQMapWX = require('../../libs/qqmap-wx-jssdk.min.js');
+var qqmapwx = new QQMapWX({
+  key:"2U5BZ-VCCRX-KRG4H-TCQMG-M3UW6-HTFAG"
+})
+
 const app = getApp()
 
 Page({
@@ -216,16 +221,76 @@ Page({
             return step
           })
         console.log(res.data.result.routes[0].steps)
-
+        //TODO
+        var polyLine = that.transStepToPolyline(res.data.result.routes[0].steps)
+        console.log(polyLine)
         that.data.placeList[des].taxi = res.data.result.routes[0]
+        that.data.placeList[des].taxi.polyLine = polyLine
         that.data.placeList[des].taxi.desc = that.durationToStr(res.data.result.routes[0].duration)
 
         that.setData({
           placeList: that.data.placeList,
         })
+        that.b2QLoc(des);
         that.savePlaceData()
       }
     })
+  },
+  transStepToPolyline:function(steps){
+    var that = this
+    console.log(steps)
+    var points = new Array();
+    for (var i = 0; i < steps.length; i++) {
+      var step = steps[i]
+      if (i == 0) {
+        var pointA = {
+          longitude: step.stepOriginLocation.lng,
+          latitude: step.stepOriginLocation.lat
+        }
+        points.push(pointA)
+      }
+      var pointB = {
+        longitude: step.stepDestinationLocation.lng,
+        latitude: step.stepDestinationLocation.lat
+      }
+      points.push(pointB)
+    };
+    console.log("points:")
+    console.log(points)
+
+    var polyLine=[{
+      points: points,
+      color: "#FF0000DD",
+      width: 10,
+      dottedLine: false
+    }]
+    return polyLine
+  },
+
+
+  //百度坐标转换为腾讯坐标 计算一组
+  b2QLoc: function (i) {
+    var that = this
+    console.log(i)
+    console.log(that.data.placeList[i])
+    if (that.data.placeList[i].taxi.polyLine[0].points.length>0){
+      for (var j = 0; j < that.data.placeList[i].taxi.polyLine[0].points.length;j++){
+        qqmapwx.reverseGeocoder({
+          location: that.data.placeList[i].taxi.polyLine[0].points[j],
+          coord_type: 3,//baidu经纬度
+          success: function (res) {
+            var pointQ = {
+              latitude: res.result.ad_info.location.lat,
+              longitude: res.result.ad_info.location.lng
+            }
+            that.data.placeList[i].taxi.polyLine[0].points[j] = pointQ
+            that.setData({
+              placeList: that.data.placeList
+            })
+          }
+        });
+      }
+    }
   },
 
   countAll: function () {
@@ -409,6 +474,7 @@ Page({
       });
       that.countdown(that);
     }, 1000)
-  }
+  },
+ 
 
 })
