@@ -89,7 +89,7 @@ Page({
       hasUserInfo: true
     })
   },
-  getMapData: function (e) {
+  getMapData: function () {
 
     var that = this;
 
@@ -120,42 +120,7 @@ Page({
     }
 
   },
-  bindKeyInput2: function (e) {
-    console.log(this.chkstrlen(e.detail.value))
-    if (this.chkstrlen(e.detail.value) < 4) {
-      return
-    }
 
-    var that = this;
-    var fail = function (data) {
-      console.log("bmap fail")
-      console.log(data)
-    };
-    var success = function (data) {
-      console.log("bmap success")
-      console.log(data)
-      that.setData({
-        suggestList: data.result,
-        hasSuggest: true
-      })
-    }
-
-    try {
-      bmap.suggestion({
-        query: e.detail.value,
-        region: "全国",
-        city_limit: false,
-        fail: fail,
-        success: success
-      })
-    } catch (e) {
-      console.log("bmap error")
-      console.log(e)
-    }
-
-
-
-  },
   bindKeyInput: function (e) {
 
     this.setData({
@@ -164,7 +129,6 @@ Page({
     this.setData({
       inputValue: e.detail.value
     })
-    //console.log(this.data.inputValue)
   },
 
   savePlaceData: function () {

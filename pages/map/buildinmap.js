@@ -1,7 +1,13 @@
 // pages/map/buildinmap.js
 
 const app = getApp()
-var wxMarkerData = []; 
+var wxMarkerData = [];
+var BMap = require('../../libs/bmap-wx.js');
+var bak = 'vinFTrI4DisyXN3yHe3WZFO8oAiyB4ws';
+var bmap = new BMap.BMapWX({
+  ak: bak
+});
+
 
 Page({
 
@@ -10,11 +16,11 @@ Page({
    */
   data: {
     markers: [],
-    pois:[],
+    pois: [],
     latitude: '',
     longitude: '',
     rgcData: {}
-  }, 
+  },
 
   /**
    * 生命周期函数--监听页面加载
@@ -35,9 +41,9 @@ Page({
     }
     markers.push(markerData)
 
-    for (var i = 0; i < pois.length;i++,j++){
+    for (var i = 0; i < pois.length; i++ , j++) {
       var marker = {
-        id:j,
+        id: j,
         latitude: pois[i].point.y,
         longitude: pois[i].point.x,
         address: pois[i].addr,
@@ -45,7 +51,7 @@ Page({
       }
       markers.push(marker)
     }
-    
+
 
     console.log(markers)
     this.setData({
@@ -57,83 +63,87 @@ Page({
     });
     this.setData({
       longitude: wxMarkerData.longitude
-    }); 
+    });
     this.showSearchInfo(markers, 0);
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-  
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-  
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-  
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-  
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-  
   },
   makertap: function (e) {
     var that = this;
     var id = e.markerId;
     console.log(e.markerId)
     that.showSearchInfo(that.data.markers, id);
-  }, 
+  },
 
   showSearchInfo: function (data, i) {
     var that = this;
     that.setData({
       rgcData: {
-        address:data[i].address,
-        desc:data[i].name,
+        address: data[i].address,
+        desc: data[i].name,
       }
     });
   },
-  makesure: function(){
+  makesure: function () {
     var that = this;
     var pages = getCurrentPages();
     var currPage = pages[pages.length - 1];   //当前页面
     var prevPage = pages[pages.length - 2];  //上一个页面
     console.log(that.data)
-    prevPage.setData({
-      inputValue: that.data.rgcData.desc
-    })
+    that.getMapData(prevPage,that.data.rgcData.desc)
     wx.navigateBack()
-  }
+  },
+
+  //通过点击图标获得的地址将直接更新到前页面的【目的地列表】中
+  getMapData: function (that,desc) {
+    console.log("getMapData："+desc)
+    var fail = function (data) {
+      console.log("bmap fail")
+      console.log(data)
+    };
+    var success = function (data) {
+      console.log("bmap success")
+      console.log(data)
+      var list = that.data.placeList
+      var listId = list.length - 1
+      data.result[0].hidden = true
+      list.push(data.result[0])
+      if (listId > 0) {
+        that.setData({
+          hasPlace: true
+        })
+      }
+      that.setData({
+        placeList: list,
+        suggestList: [],
+        hasSuggest: false,
+        inputValue: ""
+      })
+      //如果当前不是第一个节点，则计算跟第一个节点的距离和行驶时间
+      if (list.length > 1) {
+        that.caldis(listId, listId + 1)
+      } else {
+        that.savePlaceData()
+      }
+      console.log(that.data.placeList)
+    }
+
+    try {
+      bmap.suggestion({
+        query: desc,
+        region: "全国",
+        city_limit: false,
+        fail: fail,
+        success: success
+      })
+    } catch (e) {
+      console.log("bmap error")
+      console.log(e)
+    }
+
+
+
+
+  },
+
+
+
 })
