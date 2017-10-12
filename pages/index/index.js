@@ -7,8 +7,9 @@ var bmap = new BMap.BMapWX({
 });
 
 var QQMapWX = require('../../libs/qqmap-wx-jssdk.min.js');
+var qqkey = "2U5BZ-VCCRX-KRG4H-TCQMG-M3UW6-HTFAG"
 var qqmapwx = new QQMapWX({
-  key:"2U5BZ-VCCRX-KRG4H-TCQMG-M3UW6-HTFAG"
+  key: qqkey
 })
 
 const app = getApp()
@@ -98,24 +99,23 @@ Page({
 
     var that = this;
 
-    var fail = function (data) {
+    var fail = function (res) {
       console.log("bmap fail")
-      console.log(data)
+      console.log(res)
     };
-    var success = function (data) {
-      console.log("bmap success")
-      console.log(data)
+    var success = function (res) {
+      console.log("qqmap success")
+      console.log(res)
       that.setData({
-        suggestList: data.result,
+        suggestList: res.data,
         hasSuggest: true
       })
     }
 
     try {
-      bmap.suggestion({
-        query: that.data.inputValue,
+      qqmapwx.getSuggestion({
+        keyword: that.data.inputValue,
         region: "全国",
-        city_limit: false,
         fail: fail,
         success: success
       })
@@ -171,61 +171,28 @@ Page({
     console.log(des)
     var srcPlace = this.data.placeList[src]
     var desPlace = this.data.placeList[des]
-    var origin = "&origin=" + srcPlace.name + "|" + srcPlace.location.lat + "," + srcPlace.location.lng + "&origin_region=" + srcPlace.city
-    var destination = "&destination=" + desPlace.name + "|" + desPlace.location.lat + "," + desPlace.location.lng + "&destination_region=" + desPlace.city
-    var url = "https://api.map.baidu.com/direction/v1?mode=driving" + origin + destination + "&output=json&ak=" + bak
+    var origin = "from="+ srcPlace.location.lat + "," + srcPlace.location.lng
+    var destination = "&to="  + desPlace.location.lat + "," + desPlace.location.lng
+    //http://apis.map.qq.com/ws/direction/v1/driving/?from=39.915285,116.403857&to=39.915285,116.803857&waypoints=39.111,116.112;39.112,116.113&output=json&callback=cb&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77
+    var url = "https://apis.map.qq.com/ws/direction/v1/driving/?" + origin + destination + "&output=json&key=" + qqkey
     console.log("请求URL:\n" + url)
     wx.request({
       url: url,
       success: function (res) {
+        console.log("res")
         console.log(res)
-        var traffic_condition = ""
-        var traffic_color = ""
-        switch (res.data.result.traffic_condition) {
-          case 1:
-            traffic_condition = "畅通"
-            traffic_color = "green"
-            break
-          case 2:
-            traffic_condition = "缓行"
-            traffic_color = "red"
-            break
-          case 3:
-            traffic_condition = "无路况"
-            traffic_color = "grey"
-            break
-        }
-        console.log(res.data.result.routes[0])
         //格式化时间和距离
         res.data.result.routes[0].distance = (res.data.result.routes[0].distance / 1000).toFixed(2)
-        res.data.result.routes[0].duration = (res.data.result.routes[0].duration / 60).toFixed(2)
+        //res.data.result.routes[0].duration = (res.data.result.routes[0].duration / 60).toFixed(2)
+        console.log(res)
+        for (var i = 2; i < res.data.result.routes[0].polyline.length; i++)
+        { res.data.result.routes[0].polyline[i] = res.data.result.routes[0].polyline[i - 2] + res.data.result.routes[0].polyline[i] / 1000000 }
 
-        //路况
-        res.data.result.routes[0].traffic_condition = traffic_condition
-        res.data.result.routes[0].traffic_color = traffic_color
-        res.data.result.routes[0].steps = res.data.result.routes[0].steps
-          .map(step => {
-            var instructions = step.instructions
-              .replace(/\<b>/g, "")
-              .replace(/\<\/b>/g, "")
-              .replace(/\<br>/g, "")
-              .replace(/\<br\/>/g, "")
-              .replace(/\<font color="0xDC3C3C">/g, "")
-              .replace(/\<\/font>/g, "")
-            step.instructions = instructions
-            if (step.distance < 1000) {
-              step.distance = step.distance + "m"
-            } else {
-              step.distance = (step.distance / 1000).toFixed(2) + "km"
-            }
-            return step
-          })
-        console.log(res.data.result.routes[0].steps)
-        //TODO
-        var polyLine = that.transStepToPolyline(res.data.result.routes[0].steps)
-        console.log(polyLine)
+        console.log(res.data.result.routes[0].polyline)
+        var polyline = that.transToPoint(res.data.result.routes[0].polyline)
+        console.log(polyline)
         that.data.placeList[des].taxi = res.data.result.routes[0]
-        that.data.placeList[des].taxi.polyLine = polyLine
+        that.data.placeList[des].taxi.polyline = polyline
         that.data.placeList[des].taxi.desc = that.durationToStr(res.data.result.routes[0].duration)
 
         that.setData({
@@ -235,54 +202,24 @@ Page({
       }
     })
   },
-  transStepToPolyline:function(steps){
-    var that = this
-    console.log(steps)
-    var points = new Array();
-    for (var i = 0; i < steps.length; i++) {
-      var step = steps[i]
-      if (i == 0) {
-        var pointA = {
-          longitude: step.stepOriginLocation.lng,
-          latitude: step.stepOriginLocation.lat
-        }
-        points.push(that.BdmapEncryptToMapabc(pointA))
+  transToPoint:function(points){
+    var ps = new Array()
+    for(var i=0;i<points.length-1;i=i+2){
+      var point ={
+        latitude: points[i],
+        longitude: points[i+1]
       }
-      var pointB = {
-        longitude: step.stepDestinationLocation.lng,
-        latitude: step.stepDestinationLocation.lat
-      }
-      points.push(that.BdmapEncryptToMapabc(pointB))
-    };
-    console.log("points:")
-    console.log(points)
+      ps.push(point)
+    }
 
-    var polyLine=[{
-      points: points,
+    var polyline = [{
+      points: ps,
       color: "#FF0000DD",
-      width: 10,
+      width: 5,
       dottedLine: false
     }]
-    return polyLine
+    return polyline
   },
-
-
-  //百度坐标转换为腾讯坐标 计算一组
-  BdmapEncryptToMapabc:function (point)  
-{  
-    var fpoint= new Object();  
-    var x_pi = 3.14159265358979324 * 3000.0 / 180.0;  
-    var x = new Number(point.longitude - 0.0065);  
-    var y = new Number(point.latitude - 0.006);  
-    var z = Math.sqrt(x * x + y * y) - 0.00002 * Math.sin(y * x_pi);  
-    var theta = Math.atan2(y, x) - 0.000003 * Math.cos(x * x_pi);  
-    var Mars_lon = z * Math.cos(theta);  
-    var Mars_lat = z * Math.sin(theta);  
-    fpoint.longitude = Mars_lon;  
-    fpoint.latitude = Mars_lat;  
-    return fpoint;  
-  },  
-
 
   countAll: function () {
     console.log("countAll")
@@ -363,7 +300,7 @@ Page({
     var that = this
     wx.showModal({
       title: '提醒',
-      content: '确认删除目的地[' + delplace.name + "]?",
+      content: '确认删除目的地[' + delplace.title + "]?",
       success: function (res) {
         if (res.confirm) {
           console.log('用户点击确定')
@@ -435,11 +372,11 @@ Page({
     wx.getLocation({
       success: function(res) {
         console.log(res)
-        bmap.regeocoding({
-          pois:1,
+        qqmapwx.reverseGeocoder({
+          get_poi:1,
           success:function(data){
-            app.globalData.wxMapData = data
-            console.log(data)
+            app.globalData.wxMapData = data.result
+            console.log(data.result)
             console.log(app.globalData.wxMapData)
             wx.navigateTo({
               url:"../map/buildinmap"
