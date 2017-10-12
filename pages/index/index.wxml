@@ -25,7 +25,7 @@
     <block wx:if="{{placeList.length>0}}">
       <block wx:for="{{placeList}}" wx:for-item="place" wx:key="{{index}}">
         <block wx:if="{{index > 0}}">
-          <map id="{{index}}_map" hidden="{{place.hidden}}"  bindtap="moreInfo" polyline="{{place.taxi.polyline}}" style="width: 100%; height: 350px;" scale='10'></map> 
+          <map id="{{index}}_map"  longitude="{{place.taxi.polyline[0].points[0].longitude}}" latitude="{{place.taxi.polyline[0].points[0].latitude}}" hidden="{{place.hidden}}"  bindtap="moreInfo" polyline="{{place.taxi.polyline}}" style="width: 100%; height: 350px;" scale='12'></map> 
           <!-- 
           <block wx:for="{{place.taxi.steps}}" wx:for-item="step" wx:for-index="idx" wx:key="{{idx}}">
             <view class="weui-cell-instr" id="{{index}}_{{idx}}_moreInfo" hidden="{{place.hidden}}" bindtap="moreInfo">
@@ -53,8 +53,12 @@
     </block>
   </view>
   <view class="weui-cells__title">
-    <text class='iconfont icon-search'></text> 地点查询
-    <text class='iconfont icon-pin' style='color:blue;' bindtap='bindPin'></text>点击定位当前坐标
+    <view>
+        <text class='iconfont icon-search'></text> 地点查询
+    </view>
+    <view  bindtap='bindPin'>
+        <text class='iconfont icon-pin' style='color:blue;'></text>点击定位当前坐标
+    </view>
   </view>
 
   <view class="weui-cells weui-cells_after-title">
